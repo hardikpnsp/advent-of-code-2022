@@ -25,6 +25,9 @@ fn main() -> std::io::Result<()> {
     let max = total_calories.iter().max().unwrap();
     println!("Part 1: highest calories in elves = {:?}", max);
     total_calories.sort();
-    println!("Part 2: total of top 3 highest calories in elves = {:?}", total_calories.iter().rev().take(3).sum::<i64>());
+    println!(
+        "Part 2: total of top 3 highest calories in elves = {:?}",
+        total_calories.iter().rev().take(3).sum::<i64>()
+    );
     Ok(())
 }

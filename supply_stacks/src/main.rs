@@ -73,15 +73,6 @@ impl SupplyStack {
         }
     }
 
-    pub fn execute_moves(&mut self) {
-        for m in &self.moves {
-            for _ in 0..m.quantity {
-                let c = self.stacks[m.from].pop().unwrap();
-                self.stacks[m.to].push(c);
-            }
-        }
-    }
-
     pub fn stack_top(&self) -> String {
         self.stacks
             .iter()
@@ -91,14 +82,55 @@ impl SupplyStack {
     }
 }
 
+trait CrateMover {
+    fn execute_moves(self, supply_stack: &mut SupplyStack) -> ();
+}
+
+struct CrateMover9000 {}
+
+impl CrateMover for CrateMover9000 {
+    fn execute_moves(self, supply_stack: &mut SupplyStack) -> () {
+        for m in &supply_stack.moves {
+            for _ in 0..m.quantity {
+                let c = supply_stack.stacks[m.from].pop().unwrap();
+                supply_stack.stacks[m.to].push(c);
+            }
+        }
+    }
+}
+
+struct CrateMover9001 {}
+
+impl CrateMover for CrateMover9001 {
+    fn execute_moves(self, supply_stack: &mut SupplyStack) -> () {
+        for m in &supply_stack.moves {
+            let len = supply_stack.stacks[m.from].len();
+            let mut crates = supply_stack.stacks[m.from][(len - m.quantity as usize)..].to_vec();
+            supply_stack.stacks[m.to].append(&mut crates);
+            for _ in 0..m.quantity {
+                supply_stack.stacks[m.from].pop().unwrap();
+            }
+        }
+    }
+}
+
 fn main() {
     let file = File::open("supply_stacks/input/input.txt").unwrap();
     let lines = read_lines(file);
     let mut supply_stack = SupplyStack::from_input(&lines);
 
-    supply_stack.execute_moves();
+    let crate_mover_9000 = CrateMover9000 {};
+    crate_mover_9000.execute_moves(&mut supply_stack);
     println!(
         "Part 1 - crates at top of the stack: {:?}",
+        supply_stack.stack_top()
+    );
+
+    let mut supply_stack = SupplyStack::from_input(&lines);
+    let crate_mover_9001 = CrateMover9001 {};
+    crate_mover_9001.execute_moves(&mut supply_stack);
+    println!(
+        "Part 2 - crates at top of the stack with CrateMover9001: {:?}",
         supply_stack.stack_top()
     );
 }

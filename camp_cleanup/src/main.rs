@@ -12,7 +12,7 @@ impl Interval {
         return Interval {
             start: left.parse().unwrap(),
             end: right.parse().unwrap(),
-        }
+        };
     }
 
     pub fn contains(&self, interval: &Interval) -> bool {
@@ -20,26 +20,36 @@ impl Interval {
     }
 
     pub fn overlaps(&self, interval: &Interval) -> bool {
-        (self.start <= interval.start && interval.start <= self.end) || (self.start <= interval.end && interval.end <= self.end) || interval.contains(self)
+        (self.start <= interval.start && interval.start <= self.end)
+            || (self.start <= interval.end && interval.end <= self.end)
+            || interval.contains(self)
     }
 }
 
 fn main() {
     let file = File::open("./camp_cleanup/input/input.txt").unwrap();
     let lines = read_lines(file);
-    let fully_contained = lines.iter().map(|line| {
-        let (i1, i2) = line.split_once(",").unwrap();
-        let (i1, i2) = (Interval::from(i1), Interval::from(i2));
-        i1.contains(&i2) || i2.contains(&i1)
-    }).filter(|contained| *contained).count();
+    let fully_contained = lines
+        .iter()
+        .map(|line| {
+            let (i1, i2) = line.split_once(",").unwrap();
+            let (i1, i2) = (Interval::from(i1), Interval::from(i2));
+            i1.contains(&i2) || i2.contains(&i1)
+        })
+        .filter(|contained| *contained)
+        .count();
 
     println!("Part 1 - fully contained intervals: {:?}", fully_contained);
 
-    let ovelapped = lines.iter().map(|line| {
-        let (i1, i2) = line.split_once(",").unwrap();
-        let (i1, i2) = (Interval::from(i1), Interval::from(i2));
-        i1.overlaps(&i2)
-    }).filter(|contained| *contained).count();
+    let ovelapped = lines
+        .iter()
+        .map(|line| {
+            let (i1, i2) = line.split_once(",").unwrap();
+            let (i1, i2) = (Interval::from(i1), Interval::from(i2));
+            i1.overlaps(&i2)
+        })
+        .filter(|contained| *contained)
+        .count();
 
     println!("Part 2 - overlapped intervals: {:?}", ovelapped);
 }

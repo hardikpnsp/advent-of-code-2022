@@ -22,7 +22,7 @@ impl Buffer {
         }
     }
 
-    pub fn start_of_packet_marker(&self) -> bool {
+    pub fn start_marker(&self) -> bool {
         let set: HashSet<char> = HashSet::from_iter(self.chars.iter().cloned());
         set.len() == self.size
     }
@@ -37,8 +37,18 @@ fn main() {
 
     for (index, c) in line.chars().enumerate() {
         buffer.read(c);
-        if buffer.start_of_packet_marker() {
+        if buffer.start_marker() {
             println!("Part 1 - start of packet marker: {:?}", index + 1usize);
+            break;
+        }
+    }
+
+    let mut buffer = Buffer::new(14);
+
+    for (index, c) in line.chars().enumerate() {
+        buffer.read(c);
+        if buffer.start_marker() {
+            println!("Part 2 - start of message marker: {:?}", index + 1usize);
             break;
         }
     }

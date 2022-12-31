@@ -51,6 +51,28 @@ impl DirectoryNode {
             .filter(|directory| directory.name == name)
             .next()
     }
+
+    pub fn size(&self) -> i64 {
+        // TODO: can do caching
+        let directories = &*self.directories.borrow();
+        let files = &*self.files.borrow();
+
+        let total_file_size: i64 = files.iter().map(|file| file.size).sum();
+        let total_directory_size: i64 = directories.iter().map(|directory| directory.size()).sum();
+
+        total_file_size + total_directory_size
+    }
+
+    pub fn find_directory_of_size_at_most(&self, size: i64) -> i64 {
+        let directories = &*self.directories.borrow();
+        let directory_sizes = directories.iter().map(|directory| directory.find_directory_of_size_at_most(size)).sum();
+        let directory_size = self.size();
+        if directory_size <= size {
+            directory_sizes + directory_size
+        } else {
+            directory_sizes
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -108,6 +130,10 @@ impl System {
 
         System { root }
     }
+
+    pub fn find_directories_of_size_at_most(&self, size: i64) -> i64{
+        self.root.find_directory_of_size_at_most(size)
+    }
 }
 
 fn main() {
@@ -115,5 +141,5 @@ fn main() {
     let mut lines = read_lines(file);
     let system = System::new(&mut lines);
 
-    println!("{:#?}", system.root);
+    println!("Part 1: total size of directory with size at most 100000 - {:?}", system.find_directories_of_size_at_most(100000));
 }

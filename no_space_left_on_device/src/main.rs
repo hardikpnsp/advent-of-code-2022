@@ -46,7 +46,8 @@ impl DirectoryNode {
     pub fn find_directory(&self, name: &str) -> Option<Rc<DirectoryNode>> {
         let directories = &*self.directories.borrow();
 
-        directories.iter()
+        directories
+            .iter()
             .map(|d| Rc::clone(d))
             .filter(|directory| directory.name == name)
             .next()
@@ -65,13 +66,30 @@ impl DirectoryNode {
 
     pub fn find_directory_of_size_at_most(&self, size: i64) -> i64 {
         let directories = &*self.directories.borrow();
-        let directory_sizes = directories.iter().map(|directory| directory.find_directory_of_size_at_most(size)).sum();
+        let directory_sizes = directories
+            .iter()
+            .map(|directory| directory.find_directory_of_size_at_most(size))
+            .sum();
         let directory_size = self.size();
         if directory_size <= size {
             directory_sizes + directory_size
         } else {
             directory_sizes
         }
+    }
+
+    pub fn list_of_directories(&self) -> Vec<Rc<DirectoryNode>> {
+        let mut current_directories = self.directories.borrow().clone();
+        let mut directories: Vec<Rc<DirectoryNode>> = current_directories
+            .iter()
+            .map(|d| d.list_of_directories())
+            .flat_map(|d| d.into_iter())
+            .map(|d| Rc::clone(&d))
+            .collect();
+
+        directories.append(&mut current_directories);
+
+        directories
     }
 }
 
@@ -103,7 +121,7 @@ impl System {
                                 current = current.find_directory(directory).unwrap();
                             }
                         },
-                        "ls" => {},
+                        "ls" => {}
                         _ => {
                             panic!()
                         }
@@ -131,8 +149,30 @@ impl System {
         System { root }
     }
 
-    pub fn find_directories_of_size_at_most(&self, size: i64) -> i64{
+    pub fn find_directories_of_size_at_most(&self, size: i64) -> i64 {
         self.root.find_directory_of_size_at_most(size)
+    }
+
+    pub fn find_smallest_directory_to_free_space(
+        &self,
+        file_system_size: i64,
+        needed_unused_space: i64,
+    ) -> i64 {
+        let current_used_space = self.root.size();
+        let current_free_space = file_system_size - current_used_space;
+        let space_to_free_up = needed_unused_space - current_free_space;
+
+        let directories = self.root.list_of_directories();
+
+        let mut sizes: Vec<i64> = directories.iter().map(|d| d.size()).collect();
+
+        sizes.sort();
+
+        sizes
+            .into_iter()
+            .filter(|s| *s >= space_to_free_up)
+            .next()
+            .unwrap()
     }
 }
 
@@ -141,5 +181,12 @@ fn main() {
     let mut lines = read_lines(file);
     let system = System::new(&mut lines);
 
-    println!("Part 1: total size of directory with size at most 100000 - {:?}", system.find_directories_of_size_at_most(100000));
+    println!(
+        "Part 1: total size of directory with size at most 100000 - {:?}",
+        system.find_directories_of_size_at_most(100000)
+    );
+    println!(
+        "Part 2: size of directory to delete to free up space - {:?}",
+        system.find_smallest_directory_to_free_space(70000000, 30000000)
+    );
 }

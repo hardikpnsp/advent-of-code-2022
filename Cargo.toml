@@ -8,5 +8,6 @@ members = [
 	"supply_stacks",
 	"tuning_trouble",
 	"no_space_left_on_device",
+	"tree_top_tree_house",
 	"utils",
 ]

@@ -200,8 +200,12 @@ fn print_rope(head: Rc<RefCell<Knot>>) {
 
     let mut current = head.clone();
     loop {
-        if result[(SIZE - current.borrow().position.y) as usize][(SIZE + current.borrow().position.x) as usize] == '.' {
-            result[(SIZE - current.borrow().position.y) as usize][(SIZE + current.borrow().position.x) as usize] = current.borrow().id;
+        if result[(SIZE - current.borrow().position.y) as usize]
+            [(SIZE + current.borrow().position.x) as usize]
+            == '.'
+        {
+            result[(SIZE - current.borrow().position.y) as usize]
+                [(SIZE + current.borrow().position.x) as usize] = current.borrow().id;
         }
         if let Some(next) = current.clone().borrow().next.as_ref() {
             current = next.clone();
@@ -217,7 +221,11 @@ fn print_rope(head: Rc<RefCell<Knot>>) {
     println!()
 }
 
-fn positions_visited_by_tail(lines: &Vec<(Direction, i64)>, tail: Rc<RefCell<Knot>>, head: Rc<RefCell<Knot>>) -> usize {
+fn positions_visited_by_tail(
+    lines: &Vec<(Direction, i64)>,
+    tail: Rc<RefCell<Knot>>,
+    head: Rc<RefCell<Knot>>,
+) -> usize {
     let mut visited = HashSet::new();
     visited.insert(tail.borrow().position());
     // print_rope(head.clone());
@@ -227,19 +235,39 @@ fn positions_visited_by_tail(lines: &Vec<(Direction, i64)>, tail: Rc<RefCell<Kno
             match direction {
                 Direction::Up => {
                     head.borrow_mut().up();
-                    head.borrow().next.as_ref().unwrap().borrow_mut().update(&(head.borrow().position));
+                    head.borrow()
+                        .next
+                        .as_ref()
+                        .unwrap()
+                        .borrow_mut()
+                        .update(&(head.borrow().position));
                 }
                 Direction::Down => {
                     head.borrow_mut().down();
-                    head.borrow().next.as_ref().unwrap().borrow_mut().update(&(head.borrow().position));
+                    head.borrow()
+                        .next
+                        .as_ref()
+                        .unwrap()
+                        .borrow_mut()
+                        .update(&(head.borrow().position));
                 }
                 Direction::Right => {
                     head.borrow_mut().right();
-                    head.borrow().next.as_ref().unwrap().borrow_mut().update(&(head.borrow().position));
+                    head.borrow()
+                        .next
+                        .as_ref()
+                        .unwrap()
+                        .borrow_mut()
+                        .update(&(head.borrow().position));
                 }
                 Direction::Left => {
                     head.borrow_mut().left();
-                    head.borrow().next.as_ref().unwrap().borrow_mut().update(&(head.borrow().position));
+                    head.borrow()
+                        .next
+                        .as_ref()
+                        .unwrap()
+                        .borrow_mut()
+                        .update(&(head.borrow().position));
                 }
             }
             visited.insert(tail.borrow().position());

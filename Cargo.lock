@@ -17,6 +17,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "cathoderay_tube"
+version = "0.1.0"
+dependencies = [
+ "utils",
+]
+
+[[package]]
 name = "no_space_left_on_device"
 version = "0.1.0"
 dependencies = [

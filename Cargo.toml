@@ -10,5 +10,6 @@ members = [
 	"no_space_left_on_device",
 	"tree_top_tree_house",
 	"rope_bridge",
+	"cathoderay_tube",
 	"utils",
 ]

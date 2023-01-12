@@ -52,6 +52,16 @@ impl CpuState {
     pub fn signal_strength(&self) -> i64 {
         self.register_x * self.cycle
     }
+
+    pub fn pixel(&self) -> char {
+        let sprite_position = self.register_x;
+        let position = (self.cycle - 1) % 40;
+        if (sprite_position - 1 <= position) && (position <= sprite_position + 1) {
+            '#'
+        } else {
+            '.'
+        }
+    }
 }
 
 struct System {
@@ -61,10 +71,12 @@ struct System {
 }
 
 impl System {
-    pub fn new(lines: Vec<String>) -> Self {
-        let instructions = lines.iter().map(|line| Instruction::new(line)).collect();
+    pub fn new(lines: &Vec<String>) -> Self {
+        let mut all_instructions = lines.iter().map(|line| Instruction::new(line)).collect();
+        let mut instructions = vec![Instruction::Noop];
+        instructions.append(&mut all_instructions);
         let cpu_state = CpuState {
-            cycle: 1,
+            cycle: 0,
             register_x: 1,
         };
         System {
@@ -92,12 +104,12 @@ impl Iterator for System {
     }
 }
 
-fn part1(lines: Vec<String>) -> i64 {
+fn part1(lines: &Vec<String>) -> i64 {
     let system = System::new(lines);
 
-    let mut cpu_states = system.into_iter().flat_map(|state| state);
+    let cpu_states = system.into_iter().flat_map(|state| state);
 
-    let every_40th_cycle = cpu_states.skip(18).step_by(40).take(6);
+    let every_40th_cycle = cpu_states.skip(19).step_by(40).take(6);
 
     let signal_strength: i64 = every_40th_cycle
         .map(|state| {
@@ -108,9 +120,29 @@ fn part1(lines: Vec<String>) -> i64 {
     signal_strength
 }
 
+fn part2(lines: &Vec<String>) {
+    let system = System::new(lines);
+
+    let pixels: String = system
+        .into_iter()
+        .flat_map(|state| state)
+        .map(|state| state.pixel())
+        .collect();
+
+    let pixels = pixels.as_str();
+
+    println!("Part 2: CRT Display");
+    for i in 0..6 {
+        let start = (i * 40) as usize;
+        let end = start + 40;
+        println!("{}", &pixels[start..end])
+    }
+}
+
 fn main() {
     let file = File::open("cathoderay_tube/inputs/input.txt").unwrap();
     let lines = read_lines(file);
 
-    println!("Part 1: signal strength {:?}", part1(lines));
+    println!("Part 1: signal strength {:?}", part1(&lines));
+    part2(&lines);
 }

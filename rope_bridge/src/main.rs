@@ -45,6 +45,7 @@ impl Position {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Knot {
     id: char,
@@ -194,6 +195,7 @@ fn find_positions_visited_by_tail_2(lines: &Vec<(Direction, i64)>) -> usize {
     positions_visited_by_tail(lines, tail, head)
 }
 
+#[allow(dead_code)]
 fn print_rope(head: Rc<RefCell<Knot>>) {
     const SIZE: i64 = 15;
     let mut result = vec![vec!['.'; (2 * SIZE) as usize]; (2 * SIZE) as usize];

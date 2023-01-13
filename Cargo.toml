@@ -11,5 +11,6 @@ members = [
 	"tree_top_tree_house",
 	"rope_bridge",
 	"cathoderay_tube",
+	"monkey_in_the_middle",
 	"utils",
 ]

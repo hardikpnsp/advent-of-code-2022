@@ -1,9 +1,9 @@
-use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::fs::File;
 use std::rc::{Rc, Weak};
 use utils::read_lines;
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct FileNode {
     name: String,

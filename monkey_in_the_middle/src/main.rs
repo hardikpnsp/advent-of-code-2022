@@ -140,9 +140,31 @@ impl Monkey {
         self.items = vec![];
         item_movement
     }
+
+    pub fn process2(&mut self, common_multiple: i64) -> Vec<(i64, i64)> {
+        let item_movement: Vec<(i64, i64)> = self
+            .items
+            .iter()
+            .map(|worry_level| {
+                self.inspection_count += 1;
+                self.operation.exec(*worry_level)
+            })
+            .map(|worry_level| worry_level % common_multiple)
+            .map(|worry_level| {
+                if worry_level % self.divisibility_test == 0 {
+                    (self.true_monkey_id, worry_level)
+                } else {
+                    (self.false_monkey_id, worry_level)
+                }
+            })
+            .collect();
+
+        self.items = vec![];
+        item_movement
+    }
 }
 
-fn part1(mut monkeys: HashMap<i64, Monkey>) -> i64 {
+fn part1(monkeys: &mut HashMap<i64, Monkey>) -> i64 {
     let rounds = 20;
 
     for i in 0..rounds {
@@ -156,7 +178,7 @@ fn part1(mut monkeys: HashMap<i64, Monkey>) -> i64 {
                     monkeys.get_mut(&monkey_id).unwrap().add_item(worry_level);
                 })
         }
-        println!("After Round {}", rounds);
+        println!("After Round {}", i);
         for m in 0..monkeys.len() {
             println!(
                 "Monkey {}: {:?}",
@@ -187,8 +209,50 @@ fn part1(mut monkeys: HashMap<i64, Monkey>) -> i64 {
     part1
 }
 
-fn main() {
-    let mut file = File::open("monkey_in_the_middle/inputs/input.txt").unwrap();
+fn part2(monkeys: &mut HashMap<i64, Monkey>) -> i64 {
+    let rounds = 10000;
+
+    let common_multiple = monkeys
+        .iter()
+        .map(|(_, monkey)| monkey.divisibility_test)
+        .product();
+
+    for i in 0..rounds {
+        for m in 0..monkeys.len() {
+            let item_movement = monkeys
+                .get_mut(&(m as i64))
+                .unwrap()
+                .process2(common_multiple);
+            item_movement
+                .into_iter()
+                .for_each(|(monkey_id, worry_level)| {
+                    monkeys.get_mut(&monkey_id).unwrap().add_item(worry_level);
+                })
+        }
+    }
+    println!("After Round {}", rounds);
+    for m in 0..monkeys.len() {
+        println!(
+            "Monkey {}: inspected items {} times",
+            m,
+            monkeys.get(&(m as i64)).unwrap().inspection_count
+        );
+    }
+
+    let mut inspection_counts: Vec<i64> = monkeys
+        .iter()
+        .map(|(_, monkey)| monkey.inspection_count)
+        .collect();
+
+    inspection_counts.sort();
+
+    inspection_counts.reverse();
+
+    let part2 = inspection_counts[0] * inspection_counts[1];
+    part2
+}
+
+fn read_monkeys(file: &mut File) -> HashMap<i64, Monkey> {
     let mut text = String::new();
     file.read_to_string(&mut text).unwrap();
     let text = text.as_str();
@@ -202,7 +266,7 @@ fn main() {
     )
     .unwrap();
 
-    let monkeys: HashMap<i64, Monkey> = re
+    let mut monkeys: HashMap<i64, Monkey> = re
         .captures_iter(text)
         .map(|captures| {
             let monkey_id = captures.name("id").unwrap().as_str();
@@ -229,13 +293,22 @@ fn main() {
             )
         })
         .collect();
+    monkeys
+}
 
-    println!("{:?}", monkeys);
-
-    let part1 = part1(monkeys);
+fn main() {
+    let mut file = File::open("monkey_in_the_middle/inputs/input.txt").unwrap();
+    let mut monkeys = read_monkeys(&mut file);
 
     println!(
         "Part 1: Most active monkeys item count multiplied - {}",
-        part1
+        part1(&mut monkeys)
+    );
+
+    let mut file = File::open("monkey_in_the_middle/inputs/input.txt").unwrap();
+    let mut monkeys = read_monkeys(&mut file);
+    println!(
+        "Part 2: Most active monkeys item count multiplied - {}",
+        part2(&mut monkeys)
     );
 }

@@ -118,8 +118,49 @@ impl Hill {
 
         solver.cost[self.end.y][self.end.x]
     }
+
+    pub fn part2(&self) -> i64 {
+        let height = self.map.len();
+        let width = self.map[0].len();
+
+        let start_positions: Vec<Position> = self
+            .map
+            .iter()
+            .enumerate()
+            .map(|(y, row)| {
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, elevation)| **elevation == 1)
+                    .map(|(x, _)| Position { x, y })
+                    .collect()
+            })
+            .flat_map(|x: Vec<Position>| x)
+            .collect();
+
+        println!("No of start positions: {}", start_positions.len());
+        start_positions
+            .iter()
+            .map(|start| {
+                let mut cost = vec![vec![i64::MAX; self.map[0].len()]; self.map.len()];
+                cost[start.y][start.x] = 0;
+
+                let mut solver = RecursiveSolver {
+                    cost,
+                    width,
+                    height,
+                };
+
+                solver.process(&start, &self.map);
+
+                solver.cost[self.end.y][self.end.x]
+            })
+            .min()
+            .unwrap()
+    }
 }
 
+// Note: For part 2, running with --release flag gives quicker result
+// Might be able to optimize the solution by sharing the cost vector between multiple start_position runs
 fn main() {
     let file = File::open("hill_climbing_algorithm/inputs/inputs.txt").unwrap();
     let lines = read_lines(file);
@@ -129,4 +170,8 @@ fn main() {
     let hill = Hill::new(&field);
 
     println!("Part 1 - minimum steps to reach goal - {}", hill.part1());
+    println!(
+        "Part 2 - minimum steps to reach goal from any starting point - {}",
+        hill.part2()
+    );
 }

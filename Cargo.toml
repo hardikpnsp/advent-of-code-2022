@@ -12,5 +12,6 @@ members = [
 	"rope_bridge",
 	"cathoderay_tube",
 	"monkey_in_the_middle",
+	"hill_climbing_algorithm",
 	"utils",
 ]

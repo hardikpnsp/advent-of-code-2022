@@ -13,5 +13,6 @@ members = [
 	"cathoderay_tube",
 	"monkey_in_the_middle",
 	"hill_climbing_algorithm",
+	"distress_signal",
 	"utils",
 ]
